@@ -1188,9 +1188,11 @@ HWC2::Error HWCDisplay::SetClientTarget(buffer_handle_t target, int32_t acquire_
   sdm_layer->frame_rate = std::min(current_refresh_rate_, HWCDisplay::GetThrottlingRefreshRate());
   client_target_->SetLayerSurfaceDamage(damage);
   int translated_dataspace = TranslateFromLegacyDataspace(dataspace);
-  if (client_target_->GetLayerDataspace() != translated_dataspace) {
+  int32_t layer_dataspace = client_target_->GetLayerDataspace();
+  if (layer_dataspace == 0) layer_dataspace = HAL_DATASPACE_V0_SRGB;
+  if (layer_dataspace != translated_dataspace) {
     DLOGW("New Dataspace = %d not matching Dataspace from color mode = %d",
-           translated_dataspace, client_target_->GetLayerDataspace());
+           translated_dataspace, layer_dataspace);
     return HWC2::Error::BadParameter;
   }
   client_target_->SetLayerBuffer(target, acquire_fence);
